@@ -4,7 +4,7 @@ const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 const KEY = process.env.GROQ_API_KEY;
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = "openai/gpt-oss-120b";
 
 http.createServer(async (req, res) => {
   if (req.method === "POST" && req.url === "/api/chat") {
