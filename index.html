@@ -3,20 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07050d">
 <title>Wander AI</title>
 <style>
-:root{--bg:#212121;--bar:#2f2f2f;--ink:#ececec;--muted:#9b9b9b;--line:#3a3a3a;--code:#171717}
-@media (prefers-color-scheme:light){:root{--bg:#fff;--bar:#f4f4f4;--ink:#0d0d0d;--muted:#6b6b6b;--line:#e5e5e5;--code:#f0f0f0}}
+:root{--bg:#07050d;--panel:#0d0818;--bar:#181030;--ink:#ece8f7;--muted:#8d82ab;--line:#2a1f48;--p1:#8b5cf6;--p2:#c026d3;--code:#0a0613}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
-h1{font-size:17px;font-weight:600;margin:0}
-.hb button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
+body{background:radial-gradient(900px 500px at 50% -10%,#2a1257 0%,transparent 60%),var(--bg);color:var(--ink);font:16px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;display:flex;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+#side{position:fixed;inset:0 auto 0 0;width:280px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 12px 12px;transform:translateX(-100%);transition:transform .25s;z-index:20}
+#side.open{transform:none}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:15;display:none}
+#scrim.show{display:block}
+.logo{font-weight:700;font-size:20px;letter-spacing:2px;padding:4px 8px 14px;background:linear-gradient(90deg,#c4b5fd,#e879f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+#nc{width:100%;padding:11px;border-radius:12px;border:1px solid var(--p1);background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(192,38,211,.18));font-weight:600}
+.lbl{color:var(--muted);font-size:13px;margin:16px 8px 6px}
+#list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.it{display:flex;align-items:center;border-radius:10px}
+.it.act{background:var(--bar)}
+.it:hover{background:var(--bar)}
+.it .t{flex:1;text-align:left;background:none;border:0;padding:9px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.it .x{background:none;border:0;color:var(--muted);padding:6px 10px}
+.none{color:var(--muted);font-size:14px;padding:6px 10px}
+main{flex:1;display:flex;flex-direction:column;min-width:0;height:100%}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:rgba(13,8,24,.7);backdrop-filter:blur(10px)}
+#menu{background:none;border:1px solid var(--line);border-radius:10px;width:38px;height:38px;font-size:18px}
+header h1{font-size:17px;font-weight:600;margin:0;letter-spacing:1px;flex:1}
 #chat{flex:1;overflow-y:auto;padding:16px 14px}
-.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.wrap{max-width:740px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
 .msg{overflow-wrap:anywhere}
-.user{align-self:flex-end;background:var(--bar);padding:10px 16px;border-radius:20px;max-width:85%;white-space:pre-wrap}
+.user{align-self:flex-end;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;padding:10px 16px;border-radius:20px 20px 6px 20px;max-width:85%;white-space:pre-wrap}
 .bot{align-self:flex-start;max-width:100%;width:100%}
 .bot>*:first-child{margin-top:0}
 .bot p{margin:0 0 12px}
@@ -28,34 +44,57 @@ h1{font-size:17px;font-weight:600;margin:0}
 .bot code{background:var(--bar);padding:2px 6px;border-radius:6px;font:14px ui-monospace,Menlo,Consolas,monospace}
 .code{background:var(--code);border-radius:12px;margin:0 0 12px;overflow:hidden;border:1px solid var(--line)}
 .ch{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line)}
-.cp{background:none;border:0;color:var(--ink);font-size:13px;cursor:pointer}
+.cp{background:none;border:0;font-size:13px}
 .code pre{margin:0;padding:12px;overflow-x:auto}
 .code pre code{background:none;padding:0;font-size:13.5px;white-space:pre}
 .tw{overflow-x:auto;margin:0 0 12px}
 table{border-collapse:collapse;font-size:14.5px}
 th,td{border:1px solid var(--line);padding:6px 10px;text-align:left}
 th{background:var(--bar)}
-.hero{margin:22vh auto 0;text-align:center;font-size:26px;font-weight:600}
-form{max-width:720px;width:100%;margin:0 auto;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px))}
-.box{display:flex;align-items:flex-end;gap:8px;background:var(--bar);border-radius:26px;padding:8px 8px 8px 18px}
+.hero{text-align:center;margin:9vh auto 0;max-width:480px}
+.orb{width:120px;height:120px;margin:0 auto 22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e9d5ff,#8b5cf6 45%,#3b0764 80%);box-shadow:0 0 60px 10px rgba(139,92,246,.55),0 0 120px 30px rgba(192,38,211,.25);animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+.hero h2{font-size:28px;margin:0 0 6px;font-weight:600}
+.hero p{color:var(--muted);margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{background:var(--bar);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px}
+.chip:hover{border-color:var(--p1)}
+form{max-width:740px;width:100%;margin:0 auto;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.box{display:flex;align-items:flex-end;gap:8px;background:var(--bar);border:1px solid var(--line);border-radius:26px;padding:8px 8px 8px 18px;box-shadow:0 0 24px rgba(139,92,246,.15)}
+.box:focus-within{border-color:var(--p1)}
 textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;max-height:140px;padding:6px 0}
-#send{width:36px;height:36px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:18px;cursor:pointer}
-#send:disabled{opacity:.35}
+#send{width:36px;height:36px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font-size:18px}
+#send:disabled{opacity:.4}
+:focus-visible{outline:2px solid var(--p1);outline-offset:2px}
+@media (min-width:900px){#side{transform:none}#menu{display:none}main{margin-left:280px}#scrim{display:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Wander AI</h1>
-  <div class="hb"><button id="new" type="button">New chat</button></div>
-</header>
-<div id="chat"><div class="wrap" id="wrap"><div class="hero" id="hero">What can I help with?</div></div></div>
-<form id="f">
-  <div class="box"><textarea id="q" rows="1" placeholder="Message Wander AI"></textarea><button id="send" type="submit" aria-label="Send">↑</button></div>
-</form>
+<div id="scrim"></div>
+<aside id="side">
+  <div class="logo">WANDER AI</div>
+  <button id="nc" type="button">+ New chat</button>
+  <div class="lbl">Your chats</div>
+  <div id="list"></div>
+</aside>
+<main>
+  <header>
+    <button id="menu" type="button" aria-label="Menu">☰</button>
+    <h1>Wander AI</h1>
+  </header>
+  <div id="chat"><div class="wrap" id="wrap"></div></div>
+  <form id="f">
+    <div class="box"><textarea id="q" rows="1" placeholder="Message Wander AI"></textarea><button id="send" type="submit" aria-label="Send">↑</button></div>
+  </form>
+</main>
 <script>
 const SYS={role:"system",content:"You are Wander AI, a friendly, helpful assistant. Keep answers clear and simple. Use Markdown: short paragraphs, bullet lists, bold for key points, and code blocks for code."};
-let history=[SYS];
-const chat=document.getElementById("chat"),wrap=document.getElementById("wrap"),q=document.getElementById("q"),send=document.getElementById("send");
+const $=id=>document.getElementById(id);
+const chat=$("chat"),wrap=$("wrap"),q=$("q"),send=$("send"),side=$("side"),scrim=$("scrim"),list=$("list");
+let chats=[],cur=null;
+try{chats=JSON.parse(localStorage.getItem("wander_chats")||"[]")}catch(e){chats=[]}
+function save(){try{localStorage.setItem("wander_chats",JSON.stringify(chats))}catch(e){}}
 
 function md(src){
   const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -65,8 +104,8 @@ function md(src){
     return "\u0000"+(blocks.length-1)+"\u0000";
   });
   const inl=s=>esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g,"$1<em>$2</em>");
-  const out=[];let list=null,tbl=[];
-  const closeList=()=>{if(list){out.push("</"+list+">");list=null}};
+  const out=[];let lst=null,tbl=[];
+  const closeList=()=>{if(lst){out.push("</"+lst+">");lst=null}};
   const flushTbl=()=>{
     if(!tbl.length)return;
     const rows=tbl.filter(r=>!/^\|?\s*:?-{2,}/.test(r)).map(r=>r.replace(/^\||\|$/g,"").split("|").map(c=>c.trim()));
@@ -80,8 +119,8 @@ function md(src){
     flushTbl();
     if(/^\u0000\d+\u0000$/.test(line.trim())){closeList();out.push(line.trim())}
     else if(m=line.match(/^(#{1,6})\s+(.*)/)){closeList();const n=Math.min(m[1].length,4);out.push("<h"+n+">"+inl(m[2])+"</h"+n+">")}
-    else if(m=line.match(/^\s*[-*•]\s+(.*)/)){if(list!=="ul"){closeList();out.push("<ul>");list="ul"}out.push("<li>"+inl(m[1])+"</li>")}
-    else if(m=line.match(/^\s*\d+[.)]\s+(.*)/)){if(list!=="ol"){closeList();out.push("<ol>");list="ol"}out.push("<li>"+inl(m[1])+"</li>")}
+    else if(m=line.match(/^\s*[-*•]\s+(.*)/)){if(lst!=="ul"){closeList();out.push("<ul>");lst="ul"}out.push("<li>"+inl(m[1])+"</li>")}
+    else if(m=line.match(/^\s*\d+[.)]\s+(.*)/)){if(lst!=="ol"){closeList();out.push("<ol>");lst="ol"}out.push("<li>"+inl(m[1])+"</li>")}
     else if(/^\s*-{3,}\s*$/.test(line)){closeList();out.push("<hr>")}
     else if(line.trim()===""){closeList()}
     else{closeList();out.push("<p>"+inl(line)+"</p>")}
@@ -90,26 +129,64 @@ function md(src){
   return out.join("").replace(/\u0000(\d+)\u0000/g,(m,i)=>blocks[i]);
 }
 
-function add(t,c){const h=document.getElementById("hero");if(h)h.remove();const d=document.createElement("div");d.className="msg "+c;d.textContent=t;wrap.appendChild(d);chat.scrollTop=chat.scrollHeight;return d}
-document.getElementById("new").onclick=()=>{history=[SYS];wrap.innerHTML='<div class="hero" id="hero">What can I help with?</div>'};
+function openSide(o){side.classList.toggle("open",o);scrim.classList.toggle("show",o)}
+$("menu").onclick=()=>openSide(true);
+scrim.onclick=()=>openSide(false);
+
+function addMsg(t,c,html){const d=document.createElement("div");d.className="msg "+c;if(html)d.innerHTML=t;else d.textContent=t;wrap.appendChild(d);chat.scrollTop=chat.scrollHeight;return d}
+
+function hero(){
+  wrap.innerHTML='<div class="hero"><div class="orb"></div><h2>Wander without limits</h2><p>Ask anything. I will help you explore it.</p><div class="chips"><button class="chip" type="button">Explain something simply</button><button class="chip" type="button">Help me write code</button><button class="chip" type="button">Plan my day</button></div></div>';
+}
+
+function renderList(){
+  list.innerHTML="";
+  if(!chats.length){list.innerHTML='<div class="none">No chats yet</div>';return}
+  chats.slice().sort((a,b)=>b.updated-a.updated).forEach(c=>{
+    const row=document.createElement("div");row.className="it"+(cur&&cur.id===c.id?" act":"");
+    const t=document.createElement("button");t.className="t";t.type="button";t.textContent=c.title;
+    t.onclick=()=>{cur=c;renderChat();renderList();openSide(false)};
+    const x=document.createElement("button");x.className="x";x.type="button";x.textContent="✕";x.setAttribute("aria-label","Delete chat");
+    x.onclick=()=>{chats=chats.filter(k=>k.id!==c.id);if(cur&&cur.id===c.id)cur=null;save();renderChat();renderList()};
+    row.appendChild(t);row.appendChild(x);list.appendChild(row);
+  });
+}
+
+function renderChat(){
+  wrap.innerHTML="";
+  if(!cur||!cur.messages.length){hero();return}
+  cur.messages.forEach(m=>{if(m.role==="user")addMsg(m.content,"user");else addMsg(md(m.content),"bot",true)});
+  chat.scrollTop=chat.scrollHeight;
+}
+
+$("nc").onclick=()=>{cur=null;renderChat();renderList();openSide(false)};
 wrap.addEventListener("click",e=>{
   if(e.target.classList.contains("cp")){
     const code=e.target.closest(".code").querySelector("code").textContent;
     navigator.clipboard.writeText(code).then(()=>{e.target.textContent="Copied";setTimeout(()=>e.target.textContent="Copy",1500)});
   }
+  if(e.target.classList.contains("chip")){q.value=e.target.textContent;$("f").requestSubmit()}
 });
 q.addEventListener("input",()=>{q.style.height="auto";q.style.height=q.scrollHeight+"px"});
-document.getElementById("f").onsubmit=async ev=>{
-  ev.preventDefault();const text=q.value.trim();if(!text)return;
-  q.value="";q.style.height="auto";add(text,"user");history.push({role:"user",content:text});
-  const out=add("…","bot");send.disabled=true;
+q.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();$("f").requestSubmit()}});
+
+$("f").onsubmit=async ev=>{
+  ev.preventDefault();const text=q.value.trim();if(!text||send.disabled)return;
+  q.value="";q.style.height="auto";
+  if(!cur){cur={id:Date.now().toString(36),title:text.slice(0,40),messages:[],updated:Date.now()};chats.push(cur);wrap.innerHTML=""}
+  cur.messages.push({role:"user",content:text});cur.updated=Date.now();
+  addMsg(text,"user");renderList();
+  const out=addMsg("…","bot");send.disabled=true;
   try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});
+    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[SYS].concat(cur.messages)})});
     const data=await r.json();if(!r.ok)throw new Error(data.error&&data.error.message||"Request failed");
-    const reply=data.choices[0].message.content;out.innerHTML=md(reply);history.push({role:"assistant",content:reply});
-  }catch(err){out.textContent="Error: "+err.message;history.pop()}
-  send.disabled=false;chat.scrollTop=chat.scrollHeight;
+    const reply=data.choices[0].message.content;
+    out.innerHTML=md(reply);cur.messages.push({role:"assistant",content:reply});cur.updated=Date.now();
+  }catch(err){out.textContent="Error: "+err.message;cur.messages.pop()}
+  save();renderList();send.disabled=false;chat.scrollTop=chat.scrollHeight;
 };
+
+renderChat();renderList();
 </script>
 </body>
 </html>
