@@ -4,24 +4,13 @@ const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 const KEY = process.env.GROQ_API_KEY;
-const ADMIN_KEY = process.env.ADMIN_KEY;
 const MODEL = "openai/gpt-oss-120b";
 
-const GUEST_LIMIT = 70;    // messages per day for everyone else
-const ADMIN_LIMIT = 1000;  // messages per day for you
+const DAILY_LIMIT = 1000; // messages per person per day
 
 const usage = new Map();
 const today = () => new Date().toISOString().slice(0, 10);
 const clientIp = req => (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
-
-// Lets you become admin by opening the site once with ?admin=YOURCODE
-const INJECT = `<script>
-(function(){
-  try{var p=new URLSearchParams(location.search).get("admin");if(p){localStorage.setItem("wander_admin",p);history.replaceState(null,"",location.pathname)}}catch(e){}
-  var of=window.fetch;
-  window.fetch=function(u,o){o=o||{};try{var k=localStorage.getItem("wander_admin");if(k){o.headers=Object.assign({},o.headers,{"x-admin-key":k})}}catch(e){}return of(u,o)}
-})();
-</script>`;
 
 function sendJson(res, status, obj) {
   res.writeHead(status, { "Content-Type": "application/json" });
@@ -30,13 +19,11 @@ function sendJson(res, status, obj) {
 
 http.createServer((req, res) => {
   if (req.method === "POST" && req.url === "/api/chat") {
-    const isAdmin = !!ADMIN_KEY && req.headers["x-admin-key"] === ADMIN_KEY;
-    const id = isAdmin ? "admin" : clientIp(req);
-    const limit = isAdmin ? ADMIN_LIMIT : GUEST_LIMIT;
+    const id = clientIp(req);
 
     let entry = usage.get(id);
     if (!entry || entry.day !== today()) entry = { day: today(), n: 0 };
-    if (entry.n >= limit) {
+    if (entry.n >= DAILY_LIMIT) {
       return sendJson(res, 429, { error: { message: "You have reached today's message limit. Please come back tomorrow." } });
     }
 
@@ -64,9 +51,9 @@ http.createServer((req, res) => {
     return;
   }
 
-  fs.readFile(path.join(__dirname, "index.html"), "utf8", (err, html) => {
+  fs.readFile(path.join(__dirname, "index.html"), (err, html) => {
     if (err) { res.writeHead(404); return res.end("Not found"); }
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(html.replace("</body>", INJECT + "</body>"));
+    res.end(html);
   });
 }).listen(PORT, () => console.log("Wander AI running on " + PORT));
