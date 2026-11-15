@@ -25,6 +25,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .it .t{flex:1;text-align:left;background:none;border:0;padding:9px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .it .x{background:none;border:0;color:var(--muted);padding:6px 10px}
 .none{color:var(--muted);font-size:14px;padding:6px 10px}
+#libb{margin-top:8px;padding:11px;border-radius:12px;border:1px solid var(--line);background:var(--bar);font-weight:600}
 main{flex:1;display:flex;flex-direction:column;min-width:0;height:100%}
 header{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:rgba(13,8,24,.7);backdrop-filter:blur(10px)}
 #menu{background:none;border:1px solid var(--line);border-radius:10px;width:38px;height:38px;font-size:18px}
@@ -60,12 +61,42 @@ th{background:var(--bar)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .chip{background:var(--bar);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:14px}
 .chip:hover{border-color:var(--p1)}
-form{max-width:740px;width:100%;margin:0 auto;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px))}
-.box{display:flex;align-items:flex-end;gap:8px;background:var(--bar);border:1px solid var(--line);border-radius:26px;padding:8px 8px 8px 18px;box-shadow:0 0 24px rgba(139,92,246,.15)}
+form{position:relative;max-width:740px;width:100%;margin:0 auto;padding:8px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.box{display:flex;align-items:flex-end;gap:8px;background:var(--bar);border:1px solid var(--line);border-radius:26px;padding:8px;box-shadow:0 0 24px rgba(139,92,246,.15)}
 .box:focus-within{border-color:var(--p1)}
-textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;max-height:140px;padding:6px 0}
-#send{width:36px;height:36px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font-size:18px}
+textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;max-height:140px;padding:6px 4px}
+#send{width:36px;height:36px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font-size:18px;flex:none}
 #send:disabled{opacity:.4}
+#plus,#mic{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:none;padding:0;flex:none}
+#plus{font-size:22px;line-height:1}
+#mic{font-size:16px}
+#mic.on{background:var(--p2);border-color:var(--p2)}
+.gen{max-width:100%;border-radius:14px;display:block;margin:0 0 8px;border:1px solid var(--line)}
+.dl{color:#c4b5fd}
+#pmenu{position:absolute;left:14px;bottom:calc(72px + env(safe-area-inset-bottom,0px));background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;display:none;min-width:210px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:10}
+#pmenu.show{display:block}
+#pmenu button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 12px;border-radius:10px}
+#pmenu button:hover{background:var(--bar)}
+#imgchip{display:none;margin:0 0 8px 4px;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(192,38,211,.25));border:1px solid var(--p1);border-radius:999px;padding:4px 6px 4px 12px;font-size:14px;width:fit-content}
+#imgchip.show{display:flex}
+#imgchip button{background:none;border:0;padding:0 6px;font-size:15px}
+#attach{display:none;margin:0 0 8px 4px;align-items:center;gap:8px;width:fit-content;background:var(--bar);border:1px solid var(--line);border-radius:14px;padding:6px}
+#attach.show{display:flex}
+#attach img{width:48px;height:48px;object-fit:cover;border-radius:8px}
+#attach button{background:none;border:0;padding:0 6px;font-size:15px}
+#libm{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:30;display:none;align-items:center;justify-content:center;padding:16px}
+#libm.show{display:flex}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 0 60px rgba(139,92,246,.3)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sh h2{margin:0;font-size:20px}
+.sh button{background:none;border:0;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{background:var(--bar);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tile img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
+.tile .tb{display:flex;align-items:center;padding:6px 8px;font-size:13px}
+.tile .tb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;color:var(--muted)}
+.tile .tb a,.tile .tb button{background:none;border:0;padding:2px 6px;font-size:15px;color:var(--ink);text-decoration:none}
+.empty{color:var(--muted);padding:10px}
 :focus-visible{outline:2px solid var(--p1);outline-offset:2px}
 @media (min-width:900px){#side{transform:none}#menu{display:none}main{margin-left:280px}#scrim{display:none!important}}
 </style>
@@ -77,6 +108,7 @@ textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(
   <button id="nc" type="button">+ New chat</button>
   <div class="lbl">Your chats</div>
   <div id="list"></div>
+  <button id="libb" type="button">🖼 Library</button>
 </aside>
 <main>
   <header>
@@ -85,16 +117,35 @@ textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(
   </header>
   <div id="chat"><div class="wrap" id="wrap"></div></div>
   <form id="f">
-    <div class="box"><textarea id="q" rows="1" placeholder="Message Wander AI"></textarea><button id="send" type="submit" aria-label="Send">↑</button></div>
+    <div id="pmenu"><button id="mcam" type="button">📷 Camera</button><button id="mpho" type="button">🖼 Photos</button><button id="mimg" type="button">✨ Create image</button><button id="mlang" type="button">🌐 Voice: English</button></div>
+    <div id="attach"><img id="athumb" alt=""><span>Photo attached</span><button id="ax" type="button" aria-label="Remove photo">✕</button></div>
+    <div id="imgchip"><span>✨ Create image</span><button id="chipx" type="button" aria-label="Remove">✕</button></div>
+    <div class="box"><button id="plus" type="button" aria-label="Add">+</button><textarea id="q" rows="1" placeholder="Message Wander AI"></textarea><button id="mic" type="button" aria-label="Voice">🎙</button><button id="send" type="submit" aria-label="Send">↑</button></div>
   </form>
 </main>
+<div id="libm"><div class="sheet">
+  <div class="sh"><h2>Your library</h2><button id="libx" type="button" aria-label="Close">✕</button></div>
+  <div id="libg" class="grid"></div>
+</div></div>
+<input type="file" id="fcam" accept="image/*" capture="environment" hidden>
+<input type="file" id="fpho" accept="image/*" hidden>
 <script>
 const SYS={role:"system",content:"You are Wander AI, a friendly, helpful assistant. Keep answers clear and simple. Use Markdown: short paragraphs, bullet lists, bold for key points, and code blocks for code."};
 const $=id=>document.getElementById(id);
 const chat=$("chat"),wrap=$("wrap"),q=$("q"),send=$("send"),side=$("side"),scrim=$("scrim"),list=$("list");
 let chats=[],cur=null;
+let imgMode=false,attach=null,rec=null,voiceOn=false,db=null;
+let voiceLang="en-IN";
+try{voiceLang=localStorage.getItem("wander_vlang")||"en-IN"}catch(e){}
 try{chats=JSON.parse(localStorage.getItem("wander_chats")||"[]")}catch(e){chats=[]}
-function save(){try{localStorage.setItem("wander_chats",JSON.stringify(chats))}catch(e){}}
+function save(){try{localStorage.setItem("wander_chats",JSON.stringify(chats,(k,v)=>k==="src"?undefined:v))}catch(e){}}
+const h=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+function openDB(){return new Promise(res=>{try{const r=indexedDB.open("wander",1);r.onupgradeneeded=()=>r.result.createObjectStore("lib",{keyPath:"id"});r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>res()}catch(e){res()}})}
+function dbPut(o){return new Promise(res=>{if(!db)return res();try{const t=db.transaction("lib","readwrite");t.objectStore("lib").put(o);t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}})}
+function dbAll(){return new Promise(res=>{if(!db)return res([]);try{const r=db.transaction("lib").objectStore("lib").getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>res([])}catch(e){res([])}})}
+function dbGet(id){return new Promise(res=>{if(!db)return res(null);try{const r=db.transaction("lib").objectStore("lib").get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)}catch(e){res(null)}})}
+function dbDel(id){return new Promise(res=>{if(!db)return res();try{const t=db.transaction("lib","readwrite");t.objectStore("lib").delete(id);t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}})}
 
 function md(src){
   const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -109,9 +160,9 @@ function md(src){
   const flushTbl=()=>{
     if(!tbl.length)return;
     const rows=tbl.filter(r=>!/^\|?\s*:?-{2,}/.test(r)).map(r=>r.replace(/^\||\|$/g,"").split("|").map(c=>c.trim()));
-    let h='<div class="tw"><table>';
-    rows.forEach((r,i)=>{h+="<tr>"+r.map(c=>(i==0?"<th>":"<td>")+inl(c)+(i==0?"</th>":"</td>")).join("")+"</tr>"});
-    out.push(h+"</table></div>");tbl=[];
+    let t='<div class="tw"><table>';
+    rows.forEach((r,i)=>{t+="<tr>"+r.map(c=>(i==0?"<th>":"<td>")+inl(c)+(i==0?"</th>":"</td>")).join("")+"</tr>"});
+    out.push(t+"</table></div>");tbl=[];
   };
   for(const line of src.split("\n")){
     let m;
@@ -127,6 +178,58 @@ function md(src){
   }
   closeList();flushTbl();
   return out.join("").replace(/\u0000(\d+)\u0000/g,(m,i)=>blocks[i]);
+}
+
+function imgBlock(m){
+  if(!m.src)return m.lib?"<p>Loading image…</p>":"<p>🖼 Image not saved after you left this chat.</p>";
+  return '<img class="gen" alt="Generated image" src="'+m.src+'"><p><a class="dl" download="wander-ai.jpg" href="'+m.src+'">Download</a></p>';
+}
+function userHtml(m){
+  return (m.photo?(m.src?'<img class="gen" alt="Your photo" style="max-width:220px" src="'+m.src+'">':"<p>📷 Photo (not saved)</p>"):"")+h(m.content);
+}
+function addUser(m){if(m.photo)addMsg(userHtml(m),"user",true);else addMsg(m.content,"user")}
+function apiMessages(){
+  const msgs=cur.messages.filter(m=>!m.img);
+  let last=-1;msgs.forEach((m,i)=>{if(m.photo&&m.src)last=i});
+  return [SYS].concat(msgs.map((m,i)=>{
+    if(m.photo&&i===last)return{role:"user",content:[{type:"text",text:m.content},{type:"image_url",image_url:{url:m.src}}]};
+    if(m.photo)return{role:"user",content:"[The user shared a photo] "+m.content};
+    return{role:m.role,content:m.content};
+  }));
+}
+function clearAttach(){attach=null;$("attach").classList.remove("show");$("athumb").removeAttribute("src")}
+function loadPhoto(file){
+  if(!file)return;
+  const rd=new FileReader();
+  rd.onload=()=>{const im=new Image();im.onload=()=>{
+    const sc=Math.min(1,1024/Math.max(im.width,im.height));
+    const w=Math.round(im.width*sc),ht=Math.round(im.height*sc);
+    const c=document.createElement("canvas");c.width=w;c.height=ht;c.getContext("2d").drawImage(im,0,0,w,ht);
+    setImg(false);attach=c.toDataURL("image/jpeg",0.82);$("athumb").src=attach;$("attach").classList.add("show");
+  };im.src=rd.result};
+  rd.readAsDataURL(file);
+}
+function speak(t){
+  if(!window.speechSynthesis)return;
+  const p=t.replace(/```[\s\S]*?```/g," ").replace(/[*#`_>|]/g,"").replace(/\[([^\]]+)\]\([^)]+\)/g,"$1").slice(0,1200);
+  const u=new SpeechSynthesisUtterance(p);u.lang=voiceLang;
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+async function openLib(){
+  $("libm").classList.add("show");openSide(false);
+  const g=$("libg");g.innerHTML="";
+  const items=(await dbAll()).sort((a,b)=>b.time-a.time);
+  if(!items.length){g.innerHTML='<div class="empty">No images yet. Tap + and choose Create image.</div>';return}
+  items.forEach(o=>{
+    const t=document.createElement("div");t.className="tile";
+    const im=document.createElement("img");im.src=o.src;im.alt=o.prompt;im.loading="lazy";
+    const tb=document.createElement("div");tb.className="tb";
+    const sp=document.createElement("span");sp.textContent=o.prompt;
+    const a=document.createElement("a");a.href=o.src;a.download="wander-ai.jpg";a.textContent="⬇";
+    const d=document.createElement("button");d.type="button";d.textContent="✕";d.setAttribute("aria-label","Delete image");
+    d.onclick=async()=>{await dbDel(o.id);t.remove()};
+    tb.append(sp,a,d);t.append(im,tb);g.appendChild(t);
+  });
 }
 
 function openSide(o){side.classList.toggle("open",o);scrim.classList.toggle("show",o)}
@@ -155,7 +258,13 @@ function renderList(){
 function renderChat(){
   wrap.innerHTML="";
   if(!cur||!cur.messages.length){hero();return}
-  cur.messages.forEach(m=>{if(m.role==="user")addMsg(m.content,"user");else addMsg(md(m.content),"bot",true)});
+  cur.messages.forEach(m=>{
+    if(m.role==="user")addUser(m);
+    else if(m.img){
+      const d=addMsg(imgBlock(m),"bot",true);
+      if(!m.src&&m.lib)dbGet(m.lib).then(o=>{if(o){m.src=o.src;d.innerHTML=imgBlock(m)}else d.innerHTML="<p>🖼 This image was deleted from your library.</p>"});
+    }else addMsg(md(m.content),"bot",true);
+  });
   chat.scrollTop=chat.scrollHeight;
 }
 
@@ -167,26 +276,74 @@ wrap.addEventListener("click",e=>{
   }
   if(e.target.classList.contains("chip")){q.value=e.target.textContent;$("f").requestSubmit()}
 });
+
+function setImg(on){imgMode=on;if(on)clearAttach();$("imgchip").classList.toggle("show",on);q.placeholder=on?"Describe the image you want":"Message Wander AI";$("pmenu").classList.remove("show")}
+$("plus").onclick=e=>{e.stopPropagation();$("pmenu").classList.toggle("show")};
+$("mimg").onclick=()=>{setImg(true);q.focus()};
+$("chipx").onclick=()=>setImg(false);
+function langLabel(){$("mlang").textContent="🌐 Voice: "+(voiceLang==="ta-IN"?"Tamil":"English")}
+$("mlang").onclick=()=>{voiceLang=voiceLang==="ta-IN"?"en-IN":"ta-IN";try{localStorage.setItem("wander_vlang",voiceLang)}catch(e){}langLabel()};
+langLabel();
+$("mcam").onclick=()=>{$("pmenu").classList.remove("show");$("fcam").click()};
+$("mpho").onclick=()=>{$("pmenu").classList.remove("show");$("fpho").click()};
+$("fcam").onchange=e=>{loadPhoto(e.target.files[0]);e.target.value=""};
+$("fpho").onchange=e=>{loadPhoto(e.target.files[0]);e.target.value=""};
+$("ax").onclick=clearAttach;
+$("libb").onclick=openLib;
+$("libx").onclick=()=>$("libm").classList.remove("show");
+$("libm").onclick=e=>{if(e.target===$("libm"))$("libm").classList.remove("show")};
+document.addEventListener("click",e=>{if(!e.target.closest("#pmenu"))$("pmenu").classList.remove("show")});
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+$("mic").onclick=()=>{
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  if(!SR){alert("Voice input is not supported in this browser. Please try Chrome.");return}
+  if(rec){rec.stop();return}
+  rec=new SR();rec.lang=voiceLang;rec.interimResults=true;rec.continuous=false;
+  let got="";
+  rec.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;got=t;q.value=t;q.dispatchEvent(new Event("input"))};
+  rec.onerror=()=>{};
+  rec.onend=()=>{rec=null;$("mic").classList.remove("on");if(got.trim()){voiceOn=true;$("f").requestSubmit()}};
+  rec.start();$("mic").classList.add("on");
+};
+
 q.addEventListener("input",()=>{q.style.height="auto";q.style.height=q.scrollHeight+"px"});
 q.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&window.innerWidth>700){e.preventDefault();$("f").requestSubmit()}});
 
 $("f").onsubmit=async ev=>{
-  ev.preventDefault();const text=q.value.trim();if(!text||send.disabled)return;
+  ev.preventDefault();
+  let text=q.value.trim();
+  if(!text&&attach&&!imgMode)text="What is in this photo?";
+  if(!text||send.disabled)return;
+  const speakIt=voiceOn;voiceOn=false;
   q.value="";q.style.height="auto";
   if(!cur){cur={id:Date.now().toString(36),title:text.slice(0,40),messages:[],updated:Date.now()};chats.push(cur);wrap.innerHTML=""}
-  cur.messages.push({role:"user",content:text});cur.updated=Date.now();
-  addMsg(text,"user");renderList();
-  const out=addMsg("…","bot");send.disabled=true;
+  const photo=(!imgMode&&attach)?attach:null;
+  const um={role:"user",content:text,img:imgMode,photo:!!photo};
+  if(photo)um.src=photo;
+  cur.messages.push(um);cur.updated=Date.now();
+  clearAttach();addUser(um);renderList();
+  const out=addMsg(imgMode?"Creating image… this can take up to 30 seconds":"…","bot");send.disabled=true;
   try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[SYS].concat(cur.messages)})});
-    const data=await r.json();if(!r.ok)throw new Error(data.error&&data.error.message||"Request failed");
-    const reply=data.choices[0].message.content;
-    out.innerHTML=md(reply);cur.messages.push({role:"assistant",content:reply});cur.updated=Date.now();
+    if(imgMode){
+      const r=await fetch("/api/image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:text})});
+      const data=await r.json();if(!r.ok)throw new Error(data.error&&data.error.message||"Request failed");
+      const id="i"+Date.now().toString(36);
+      await dbPut({id:id,prompt:text,src:data.image,time:Date.now()});
+      const m={role:"assistant",content:text,img:true,lib:id,src:data.image};
+      cur.messages.push(m);cur.updated=Date.now();out.innerHTML=imgBlock(m);
+    }else{
+      const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:apiMessages()})});
+      const data=await r.json();if(!r.ok)throw new Error(data.error&&data.error.message||"Request failed");
+      const reply=data.choices[0].message.content||"(no answer)";
+      out.innerHTML=md(reply);cur.messages.push({role:"assistant",content:reply});cur.updated=Date.now();
+      if(speakIt)speak(reply);
+    }
   }catch(err){out.textContent=/limit/i.test(err.message)?err.message:"Error: "+err.message;cur.messages.pop()}
-  save();renderList();send.disabled=false;chat.scrollTop=chat.scrollHeight;
+  setImg(false);save();renderList();send.disabled=false;chat.scrollTop=chat.scrollHeight;
 };
 
-renderChat();renderList();
+renderList();openDB().then(renderChat);
 </script>
 </body>
 </html>
