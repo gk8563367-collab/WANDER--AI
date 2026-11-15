@@ -4,8 +4,10 @@ const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 const KEY = process.env.GROQ_API_KEY;
+const GEMINI_KEY = process.env.GEMINI_API_KEY; // for creating and editing images
 const MODEL = "openai/gpt-oss-120b";
 const VISION_MODEL = "qwen/qwen3.8-27b"; // used when a photo is attached
+const IMAGE_MODEL = "gemini-2.5-flash-image";
 
 const DAILY_LIMIT = 1000; // chat messages per person per day
 const IMAGE_LIMIT = 25;   // images per person per day
@@ -14,7 +16,6 @@ const usage = new Map();
 const imgUsage = new Map();
 const today = () => new Date().toISOString().slice(0, 10);
 const clientIp = req => (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
-const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function sendJson(res, status, obj) {
   res.writeHead(status, { "Content-Type": "application/json" });
@@ -30,20 +31,56 @@ function readBody(req, cb, max) {
   req.on("end", () => cb(body));
 }
 
-async function makeImage(prompt) {
-  const url = "https://image.pollinations.ai/prompt/" + encodeURIComponent(prompt) +
-    "?width=768&height=768&model=flux&nologo=true&seed=" + Math.floor(Math.random() * 1000000);
-  for (let i = 0; i < 2; i++) {
-    const r = await fetch(url);
-    const type = r.headers.get("content-type") || "";
-    if (r.ok && type.startsWith("image/")) {
-      const buf = Buffer.from(await r.arrayBuffer());
-      return "data:" + type.split(";")[0] + ";base64," + buf.toString("base64");
+const TOOL_NOTE = "You can create new images and edit the user's photo with the tools you have. When the user asks for that (in any language, including Tamil), call the right tool instead of saying you cannot. For edits, write the instruction in English and say to keep the person's face and everything else unchanged.";
+
+const CREATE_TOOL = { type: "function", function: {
+  name: "create_image",
+  description: "Create a brand new image from a text description. Use when the user asks you to draw, generate or create a picture.",
+  parameters: { type: "object", properties: { prompt: { type: "string", description: "Detailed English description of the image" } }, required: ["prompt"] }
+} };
+
+const EDIT_TOOL = { type: "function", function: {
+  name: "edit_photo",
+  description: "Edit the photo the user attached or the last image in the chat: add, remove or change things, background, style or colors, keeping the person recognizable. Use when the user asks to modify that photo.",
+  parameters: { type: "object", properties: { instruction: { type: "string", description: "Clear English edit instruction, for example: Add a red hat. Keep the face and everything else exactly the same." } }, required: ["instruction"] }
+} };
+
+async function geminiImage(prompt, photo) {
+  try {
+    const parts = [{ text: prompt }];
+    if (photo) {
+      const m = /^data:(image\/[\w+.-]+);base64,(.+)$/.exec(photo);
+      if (!m) return { error: "Invalid photo." };
+      parts.push({ inline_data: { mime_type: m[1], data: m[2] } });
     }
-    if (r.status === 429 && i === 0) { await sleep(16000); continue; }
-    break;
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + IMAGE_MODEL + ":generateContent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY },
+      body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ["TEXT", "IMAGE"] } })
+    });
+    const data = await r.json().catch(() => ({}));
+    const cand = data && data.candidates && data.candidates[0];
+    const ps = (cand && cand.content && cand.content.parts) || [];
+    for (const p of ps) {
+      const d = p.inlineData || p.inline_data;
+      if (d && d.data) return { image: "data:" + (d.mimeType || d.mime_type || "image/png") + ";base64," + d.data };
+    }
+    const err = data && data.error && data.error.message;
+    const txt = ps.map(p => p.text).filter(Boolean).join(" ");
+    return { error: String(err || txt || "No image came back (code " + r.status + ").").slice(0, 200) };
+  } catch (e) {
+    return { error: "Could not reach the image service." };
   }
-  return null;
+}
+
+async function callGroq(payload) {
+  const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + KEY },
+    body: JSON.stringify(payload)
+  });
+  const data = await r.json().catch(() => ({}));
+  return { r, data };
 }
 
 http.createServer((req, res) => {
@@ -56,51 +93,61 @@ http.createServer((req, res) => {
     }
     readBody(req, async body => {
       try {
-        const { messages } = JSON.parse(body);
+        const { messages, photo } = JSON.parse(body);
         if (!Array.isArray(messages)) throw new Error("bad request");
         let images = 0;
         messages.forEach(m => {
           if (Array.isArray(m.content)) m.content.forEach(p => { if (p.type === "image_url") images++; });
         });
         if (images > 3) return sendJson(res, 400, { error: { message: "Too many photos in one message." } });
-        const payload = { model: images ? VISION_MODEL : MODEL, messages };
-        if (images) payload.reasoning_format = "hidden";
+
+        const usable = typeof photo === "string" && photo.startsWith("data:image/") && photo.length < 3000000;
+        const tools = [];
+        if (GEMINI_KEY) { tools.push(CREATE_TOOL); if (usable) tools.push(EDIT_TOOL); }
+
+        const msgs = messages.map(m => Object.assign({}, m));
+        if (tools.length && msgs[0] && msgs[0].role === "system" && typeof msgs[0].content === "string") {
+          msgs[0].content += " " + TOOL_NOTE;
+        }
+        const base = { model: images ? VISION_MODEL : MODEL, messages: msgs };
+        if (images) base.reasoning_format = "hidden";
+
         entry.n += 1;
         usage.set(id, entry);
-        const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: "Bearer " + KEY },
-          body: JSON.stringify(payload)
-        });
-        const data = await r.json();
-        sendJson(res, r.status, data);
+
+        let out = await callGroq(tools.length ? Object.assign({}, base, { tools, tool_choice: "auto" }) : base);
+        if (!out.r.ok && tools.length) out = await callGroq(base);
+
+        const msg = out.data && out.data.choices && out.data.choices[0] && out.data.choices[0].message;
+        const call = msg && msg.tool_calls && msg.tool_calls[0];
+        if (call && call.function) {
+          let args = {};
+          try { args = JSON.parse(call.function.arguments || "{}"); } catch (e) {}
+          const isEdit = call.function.name === "edit_photo";
+          const text = String((isEdit ? args.instruction : args.prompt) || "").slice(0, 800);
+          let ie = imgUsage.get(id);
+          if (!ie || ie.day !== today()) ie = { day: today(), n: 0 };
+          let reply;
+          if (ie.n >= IMAGE_LIMIT) {
+            reply = "You have reached today's image limit (" + IMAGE_LIMIT + "). Please come back tomorrow.";
+          } else if (!text) {
+            reply = "Please tell me what image to make.";
+          } else {
+            const g = await geminiImage(text, isEdit ? photo : null);
+            if (g.image) {
+              ie.n += 1;
+              imgUsage.set(id, ie);
+              return sendJson(res, 200, { image: g.image, model: out.data.model });
+            }
+            reply = "Sorry, I could not make that image. " + g.error;
+          }
+          return sendJson(res, 200, { model: out.data.model, choices: [{ message: { role: "assistant", content: reply } }] });
+        }
+        sendJson(res, out.r.status, out.data);
       } catch (e) {
         sendJson(res, 500, { error: { message: "Server error" } });
       }
     }, 4000000);
-    return;
-  }
-
-  if (req.method === "POST" && req.url === "/api/image") {
-    const id = clientIp(req);
-    let e = imgUsage.get(id);
-    if (!e || e.day !== today()) e = { day: today(), n: 0 };
-    if (e.n >= IMAGE_LIMIT) {
-      return sendJson(res, 429, { error: { message: "You have reached today's image limit (" + IMAGE_LIMIT + "). Please come back tomorrow." } });
-    }
-    readBody(req, async body => {
-      try {
-        const p = String(JSON.parse(body).prompt || "").trim().slice(0, 500);
-        if (!p) return sendJson(res, 400, { error: { message: "Please describe the image." } });
-        const img = await makeImage(p);
-        if (!img) return sendJson(res, 503, { error: { message: "The image service is busy. Please try again in a moment." } });
-        e.n += 1;
-        imgUsage.set(id, e);
-        sendJson(res, 200, { image: img });
-      } catch (err) {
-        sendJson(res, 500, { error: { message: "Server error" } });
-      }
-    });
     return;
   }
 
